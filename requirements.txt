@@ -21,3 +21,4 @@ monai
 torch
 torchvision
 matplotlib
+scikit-learn
