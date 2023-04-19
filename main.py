@@ -21,8 +21,8 @@ def run_fold(folds, dataset, device):
       label = data['label'].to(device)
       image = data['image'].to(device)
 
-      print(f"image size = {image.size}")
-      print(f"label size = {label.size}")
+      print(f"image size = {image.shape}")
+      print(f"label size = {label.shape}")
         
 
 if __name__ == "__main__":
