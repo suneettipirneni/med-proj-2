@@ -28,8 +28,8 @@ progress_bar.close()
 
 print("Extracting download...")
 
-with tarfile.TarFile(tar, "r") as tar:
-  tar.extractall()
+with tarfile.TarFile(tar, "r") as tar_extract:
+  tar_extract.extractall()
 
 print("Cleaning up...")
 os.remove(tar)
