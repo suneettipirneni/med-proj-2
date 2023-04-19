@@ -22,3 +22,5 @@ torch
 torchvision
 matplotlib
 scikit-learn
+nibabel
+skimage
