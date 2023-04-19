@@ -11,19 +11,18 @@ import torch
 def run_fold(folds, dataset, device):
   for fold, (train_ids, labels) in enumerate(folds):
     train_subsampler = SubsetRandomSampler(train_ids)
-    test_subsampler = SubsetRandomSampler(labels)
 
     # Define data loaders for training and testing data in this fold
     trainloader = DataLoader(
                       dataset,
                       batch_size=1, sampler=train_subsampler)
-    testloader = DataLoader(
-                      dataset,
-                      batch_size=1, sampler=test_subsampler)
 
     for data in trainloader:
       label = data['label'].to(device)
       image = data['image'].to(device)
+
+      print(f"image size = {image.size}")
+      print(f"label size = {label.size}")
         
 
 if __name__ == "__main__":
