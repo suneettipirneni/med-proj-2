@@ -23,4 +23,4 @@ torchvision
 matplotlib
 scikit-learn
 nibabel
-skimage
+scikit-image
