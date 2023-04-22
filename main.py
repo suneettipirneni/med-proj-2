@@ -2,7 +2,8 @@ from monai.apps import DecathlonDataset
 from monai.losses import DiceLoss
 from transforms import train_transform
 import numpy as np
-from torch.utils.data import DataLoader, Dataset, ConcatDataset, SubsetRandomSampler
+from monai.data.dataloader import DataLoader
+from torch.utils.data import Dataset, ConcatDataset, SubsetRandomSampler
 import argparse
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
