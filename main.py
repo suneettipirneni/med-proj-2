@@ -1,12 +1,16 @@
 from monai.apps import DecathlonDataset
+from monai.losses import DiceLoss
 from transforms import train_transform
 import numpy as np
 from torch.utils.data import DataLoader, Dataset, ConcatDataset, SubsetRandomSampler
 import argparse
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
+from monai.networks.nets.unetr import UNETR
 from train import train
 import torch
+
+NUM_CLASSES = 4
 
 def run_fold(folds, dataset, device):
   for fold, (train_ids, labels) in enumerate(folds):
@@ -30,6 +34,7 @@ if __name__ == "__main__":
 
   parser.add_argument("--num_workers", type=str, default=4, help="The number of workers to use when loading the dataset")
   parser.add_argument("--k_folds", type=int, default=5, help="The number of folds to use for cross validation")
+  parser.add_argument("--num_epochs", type=int, default=20, help="The total number of epochs to run for")
 
   args = parser.parse_args()
 
@@ -41,10 +46,51 @@ if __name__ == "__main__":
     transform=train_transform,
     section="training",
     download=False,
-    num_workers=args.num_workers
+    num_workers=args.num_workers,
+    cache_rate=0.0,
   )
 
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
   folds = kfold.split(train_dataset)
-  run_fold(folds, train_dataset, device)
+
+  # We subtract by one because 0 is a class
+  model = UNETR(in_channels=4, out_channels=3, img_size=(128, 128, 128), feature_size=48)
+  model.to(device)
+
+  loss_function = DiceLoss(smooth_nr=0, smooth_dr=1e-5, squared_pred=True, to_onehot_y=False, sigmoid=True)
+  optimizer = torch.optim.Adam(model.parameters(), 1e-4, weight_decay=1e-5)
+  lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)  
+
+  for fold, (train_ids, label_ids) in enumerate(folds):
+    print(f"Fold {fold}")
+    train_subsampler = SubsetRandomSampler(train_ids)
+    test_subsampler = SubsetRandomSampler(label_ids)
+
+    # Define data loaders for training and testing data in this fold
+    trainloader = DataLoader(
+                      train_dataset,
+                      batch_size=1, sampler=train_subsampler)
+
+    # Even though this references the test data is it sampled randomly
+    # so it will not be the same items in the train loader.
+    testloader = DataLoader(
+      train_dataset,
+      batch_size=1,
+      sampler=test_subsampler
+    )  
+
+    # use amp to accelerate training
+    scaler = torch.cuda.amp.GradScaler()
+
+    train(
+      trainloader=trainloader, 
+      testloader=testloader, 
+      device=device,
+      model=model,
+      loss_fn=loss_function,
+      optimizer=optimizer,
+      num_epochs=args.num_epochs,
+      scaler=scaler,
+      lr_scheduler=lr_scheduler
+    )

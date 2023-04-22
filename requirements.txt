@@ -24,3 +24,4 @@ matplotlib
 scikit-learn
 nibabel
 scikit-image
+einops
