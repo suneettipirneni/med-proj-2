@@ -57,6 +57,9 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         if 0 == labels.count_nonzero():
           continue
 
+        if 0 == images.count_nonzero():
+          continue
+
         outputs: torch.Tensor = inference(model, images)
         outputs = torch.stack([post_trans(i) for i in decollate_batch(outputs)])
         dice_metric(outputs, labels)
