@@ -1,17 +1,15 @@
 from monai.apps import DecathlonDataset
 from monai.losses import DiceLoss
+from constants import IMAGE_SIZE, NUM_CLASSES
 from transforms import train_transform
-import numpy as np
 from monai.data.dataloader import DataLoader
-from torch.utils.data import Dataset, ConcatDataset, SubsetRandomSampler
+from torch.utils.data import SubsetRandomSampler
 import argparse
-import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 from monai.networks.nets.unetr import UNETR
 from train import train
 import torch
-
-NUM_CLASSES = 4
+import json
 
 def run_fold(folds, dataset, device):
   for fold, (train_ids, labels) in enumerate(folds):
@@ -56,7 +54,7 @@ if __name__ == "__main__":
   folds = kfold.split(train_dataset)
 
   # We subtract by one because 0 is a class
-  model = UNETR(in_channels=4, out_channels=3, img_size=(128, 128, 128), feature_size=48)
+  model = UNETR(in_channels=4, out_channels=NUM_CLASSES - 1, img_size=IMAGE_SIZE, feature_size=48)
   model.to(device)
 
   loss_function = DiceLoss(smooth_nr=0, smooth_dr=1e-5, squared_pred=True, to_onehot_y=False, sigmoid=True)
@@ -84,7 +82,7 @@ if __name__ == "__main__":
     # use amp to accelerate training
     scaler = torch.cuda.amp.GradScaler()
 
-    train(
+    statistics = train(
       trainloader=trainloader, 
       testloader=testloader, 
       device=device,
@@ -95,3 +93,7 @@ if __name__ == "__main__":
       scaler=scaler,
       lr_scheduler=lr_scheduler
     )
+
+    # Save statistics in json file
+    with open('statistics.json', 'w') as file:
+      json.dump(statistics, file)
