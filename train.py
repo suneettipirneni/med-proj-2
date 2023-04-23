@@ -59,11 +59,11 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         outputs: torch.Tensor = inference(model, images)
         outputs = [post_trans(i) for i in decollate_batch(outputs)]
         dice_metric(outputs, labels)
-        epoch_distances.append(hd(outputs, labels))
+        epoch_distances.append(hd(np.array(outputs), np.array(labels)))
 
       # Print accuracy
       print(f'Dice Score = {dice_metric.aggregate().item()}')
-      print(f'Hausdorff Distance Score = {hausdorff_distance_metric.aggregate().item()}')
+      print(f'Hausdorff Distance Score = {np.mean(epoch_distances)}')
       print('--------------------------------')
 
       epoch_hausdorff_distance_scores.append(np.mean(epoch_distances))
