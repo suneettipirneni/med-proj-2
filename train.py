@@ -57,6 +57,7 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         images: torch.Tensor = item['image'].to(device)
 
         outputs: torch.Tensor = inference(model, images)
+        print(outputs.shape)
         outputs = torch.Tensor([post_trans(i) for i in decollate_batch(outputs)])
         dice_metric(outputs, labels)
         print(f"outputs type = {type(outputs)}")
