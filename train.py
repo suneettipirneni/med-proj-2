@@ -52,17 +52,20 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         labels: torch.Tensor = item['label'].to(device)
         images: torch.Tensor = item['image'].to(device)
 
+        
+
+        outputs: torch.Tensor = inference(model, images)
+        outputs = torch.stack([post_trans(i) for i in decollate_batch(outputs)])
+        dice_metric(outputs, labels)
+
         # HD metrics can't use zero masks but they are in the dataset
         # so skip them.
         if 0 == labels.count_nonzero():
           continue
 
-        if 0 == images.count_nonzero():
+        if 0 == outputs.count_nonzero():
           continue
 
-        outputs: torch.Tensor = inference(model, images)
-        outputs = torch.stack([post_trans(i) for i in decollate_batch(outputs)])
-        dice_metric(outputs, labels)
         hausdorff_distance_metric(outputs, labels)
 
       # Print accuracy
