@@ -61,6 +61,8 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         dice_metric(outputs, labels)
         print(f"outputs type = {type(outputs)}")
         print(f"labels type = {type(labels)}") 
+        print(np.array(outputs))
+        print(labels.detach().cpu().numpy())
         epoch_distances.append(hd(np.array(outputs), labels.detach().cpu().numpy()))
 
       # Print accuracy
