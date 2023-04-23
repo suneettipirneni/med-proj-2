@@ -91,7 +91,8 @@ if __name__ == "__main__":
       optimizer=optimizer,
       num_epochs=args.num_epochs,
       scaler=scaler,
-      lr_scheduler=lr_scheduler
+      lr_scheduler=lr_scheduler,
+      fold=fold
     )
 
     # Save statistics in json file

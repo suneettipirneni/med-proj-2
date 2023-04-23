@@ -13,7 +13,7 @@ import numpy as np
 
 from util import inference, post_trans
 
-def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device, model: torch.nn.Module, loss_fn: _Loss, optimizer: Optimizer, num_epochs: int, scaler: GradScaler, lr_scheduler: _LRScheduler):
+def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device, model: torch.nn.Module, loss_fn: _Loss, optimizer: Optimizer, num_epochs: int, scaler: GradScaler, lr_scheduler: _LRScheduler, fold: int):
   dice_metric = DiceMetric(include_background=True, reduction="mean")
   hausdorff_distance_metric = HausdorffDistanceMetric(reduction="mean")
 
@@ -77,6 +77,8 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
 
       epoch_distances.clear()
       dice_metric.reset()
+
+  torch.save(model.state_dict(), f"model-fold-{fold}.pth")
 
   return {
     'epoch_losses': epoch_losses,
