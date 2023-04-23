@@ -26,26 +26,26 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
     epoch_loss = 0
     step = 0
 
-    for data in tqdm(trainloader, unit="epoch"):
-        step += 1
-        labels: torch.Tensor = data['label'].to(device)
-        images: torch.Tensor = data['image'].to(device)
+    # for data in tqdm(trainloader, unit="epoch"):
+    #     step += 1
+    #     labels: torch.Tensor = data['label'].to(device)
+    #     images: torch.Tensor = data['image'].to(device)
 
-        optimizer.zero_grad()
+    #     optimizer.zero_grad()
 
-        with torch.cuda.amp.autocast():
-            outputs = model(images)
-            loss = loss_fn(outputs, labels)
+    #     with torch.cuda.amp.autocast():
+    #         outputs = model(images)
+    #         loss = loss_fn(outputs, labels)
         
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
-        epoch_loss += loss.item()
+    #     scaler.scale(loss).backward()
+    #     scaler.step(optimizer)
+    #     scaler.update()
+    #     epoch_loss += loss.item()
     
-    lr_scheduler.step()
-    epoch_loss /= step
-    print(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
-    epoch_losses.append(epoch_loss)
+    # lr_scheduler.step()
+    # epoch_loss /= step
+    # print(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
+    # epoch_losses.append(epoch_loss)
 
     epoch_distances = []
 
@@ -59,6 +59,8 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         outputs: torch.Tensor = inference(model, images)
         outputs = [post_trans(i) for i in decollate_batch(outputs)]
         dice_metric(outputs, labels)
+        print(f"outputs type = {type(outputs)}")
+        print(f"labels type = {type(labels)}") 
         epoch_distances.append(hd(np.array(torch.Tensor.cpu(outputs)), np.array(torch.Tensor(labels))))
 
       # Print accuracy
