@@ -57,11 +57,11 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         images: torch.Tensor = item['image'].to(device)
 
         outputs: torch.Tensor = inference(model, images)
-        outputs = [post_trans(i) for i in decollate_batch(outputs)]
+        outputs = torch.Tensor([post_trans(i) for i in decollate_batch(outputs)])
         dice_metric(outputs, labels)
         print(f"outputs type = {type(outputs)}")
         print(f"labels type = {type(labels)}") 
-        print(np.array(outputs))
+        print(outputs.detach().cpu().numpy())
         print(labels.detach().cpu().numpy())
         epoch_distances.append(hd(np.array(outputs), labels.detach().cpu().numpy()))
 
