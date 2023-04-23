@@ -7,6 +7,8 @@ import torch
 from tqdm import tqdm
 from monai.data import decollate_batch
 from monai.metrics import DiceMetric, HausdorffDistanceMetric
+from medpy.metric.binary import hd
+import numpy as np
 
 from util import inference, post_trans
 
@@ -45,6 +47,8 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
     print(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
     epoch_losses.append(epoch_loss)
 
+    epoch_distances = []
+
     # Begin testing loop
     print("Beginning Testing...")
     with torch.no_grad():
@@ -55,15 +59,18 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         outputs: torch.Tensor = inference(model, images)
         outputs = [post_trans(i) for i in decollate_batch(outputs)]
         dice_metric(outputs, labels)
-        hausdorff_distance_metric(outputs, labels)
+        epoch_distances.append(hd(outputs, labels))
 
       # Print accuracy
       print(f'Dice Score = {dice_metric.aggregate().item()}')
       print(f'Hausdorff Distance Score = {hausdorff_distance_metric.aggregate().item()}')
       print('--------------------------------')
 
+      epoch_hausdorff_distance_scores.append(np.mean(epoch_distances))
+      epoch_dice_scores.append(dice_metric.aggregate().item())
+
+      epoch_distances.clear()
       dice_metric.reset()
-      hausdorff_distance_metric.reset()
 
   return {
     'epoch_losses': epoch_losses,

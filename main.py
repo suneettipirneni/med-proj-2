@@ -95,5 +95,5 @@ if __name__ == "__main__":
     )
 
     # Save statistics in json file
-    with open('statistics.json', 'w') as file:
+    with open(f'fold-{fold}-statistics.json', 'w') as file:
       json.dump(statistics, file)
