@@ -7,8 +7,6 @@ import torch
 from tqdm import tqdm
 from monai.data import decollate_batch
 from monai.metrics import DiceMetric, HausdorffDistanceMetric
-from medpy.metric.binary import hd
-import numpy as np
 
 from util import inference, post_trans
 
@@ -26,28 +24,26 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
     epoch_loss = 0
     step = 0
 
-    # for data in tqdm(trainloader, unit="epoch"):
-    #     step += 1
-    #     labels: torch.Tensor = data['label'].to(device)
-    #     images: torch.Tensor = data['image'].to(device)
+    for data in tqdm(trainloader, unit="epoch"):
+        step += 1
+        labels: torch.Tensor = data['label'].to(device)
+        images: torch.Tensor = data['image'].to(device)
 
-    #     optimizer.zero_grad()
+        optimizer.zero_grad()
 
-    #     with torch.cuda.amp.autocast():
-    #         outputs = model(images)
-    #         loss = loss_fn(outputs, labels)
+        with torch.cuda.amp.autocast():
+            outputs = model(images)
+            loss = loss_fn(outputs, labels)
         
-    #     scaler.scale(loss).backward()
-    #     scaler.step(optimizer)
-    #     scaler.update()
-    #     epoch_loss += loss.item()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+        epoch_loss += loss.item()
     
-    # lr_scheduler.step()
-    # epoch_loss /= step
-    # print(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
-    # epoch_losses.append(epoch_loss)
-
-    epoch_distances = []
+    lr_scheduler.step()
+    epoch_loss /= step
+    print(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
+    epoch_losses.append(epoch_loss)
 
     # Begin testing loop
     print("Beginning Testing...")
@@ -64,21 +60,17 @@ def train(trainloader: DataLoader, testloader: DataLoader, device: torch.device,
         outputs: torch.Tensor = inference(model, images)
         outputs = torch.stack([post_trans(i) for i in decollate_batch(outputs)])
         dice_metric(outputs, labels)
-        print(f"outputs type = {type(outputs)}")
-        print(f"labels type = {type(labels)}") 
-        print(outputs.detach().cpu().numpy())
-        print(labels.detach().cpu().numpy())
-        epoch_distances.append(hd(outputs.detach().cpu().numpy(), labels.detach().cpu().numpy()))
+        hausdorff_distance_metric(outputs, labels)
 
       # Print accuracy
       print(f'Dice Score = {dice_metric.aggregate().item()}')
-      print(f'Hausdorff Distance Score = {np.mean(epoch_distances)}')
+      print(f'Hausdorff Distance Score = {hausdorff_distance_metric.aggregate().item()}')
       print('--------------------------------')
 
-      epoch_hausdorff_distance_scores.append(np.mean(epoch_distances))
+      epoch_hausdorff_distance_scores.append(hausdorff_distance_metric.aggregate().item())
       epoch_dice_scores.append(dice_metric.aggregate().item())
 
-      epoch_distances.clear()
+      hausdorff_distance_metric.reset()
       dice_metric.reset()
 
   return {
