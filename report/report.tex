@@ -11,10 +11,17 @@
 Code for the assignment can be found at \url{https://github.com/suneettipirneni/med-proj-2}
 \section{Dataset Visualization via ITK-SNAP}
 
+Below is a demo of the a visualization I took from the dataset using ITK-SNAP:
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=0.8\textwidth]{imgs/itk-snap.png}
+	\caption{A screenshot of the ITK-SNAP visualiation of a sample from the dataset.}
+\end{figure}
 
 \section{Implementation}
 
-My implementation for this model is adapted from \cite{monaitutorial}. The core change from that tutorial to my code is that I use a MONAI's UNETR class for 3d image segmentation. I choose UNETR as it has achvied really good results with 3d image segmentation \cite{hatamizadeh2021unetr}. I choose to use the same image transformations found in \cite{monaitutorial} however, I changed the crop size of the images to $128\times 128 \times 128$. My reasoning for this was it improved the training time by a lot from the default image size of $224 \times 224 \times 155$. This dimension specifically, was found in the SWIN UNETR tutorial \cite{githubTutorialsswin_unetr_brats21_segmentation_3dipynbMain}. In hindsight I later realized that the square shape was more specific to SWIN model patches, however this didn't seem to have much effect on my results. In addition to using UNETR, I used an additional metric to measure the Hausdoff distance. This was provided via \cite{githubGitHubLolimedpy}. An issue however was with the calulations that this library did. It did not accept all-0 ground truth masks. As a result during evaluation I had to the filter out any masks that were all zeroes in order for the calculation to work properly.  
+My implementation for this model is adapted from \cite{monaitutorial}. The core change from that tutorial to my code is that I use a MONAI's UNETR class for 3d image segmentation. I choose UNETR as it has achvied really good results with 3d image segmentation \cite{hatamizadeh2021unetr}. I choose to use the same image transformations found in \cite{monaitutorial} however, I changed the crop size of the images to $128\times 128 \times 128$. My reasoning for this was it improved the training time by a lot from the default image size of $224 \times 224 \times 155$. This dimension specifically, was found in the SWIN UNETR tutorial \cite{githubTutorialsswin_unetr_brats21_segmentation_3dipynbMain}. In hindsight I later realized that the square shape was more specific to SWIN model patches, however this didn't seem to have much effect on my results. In addition to using UNETR, I used an additional metric to measure the Hausdoff distance. This was provided via \cite{githubGitHubLolimedpy}. An issue however was with the calulations that this library did. It did not accept all-0 ground truth masks. As a result during evaluation I had to the filter out any masks that were all zeroes in order for the calculation to work properly. In addition, my model uses 5-fold cross validation based on the scikit learn $KFold$ utility \cite{githubMachinelearningarticleshowtousekfoldcrossvalidationwithpytorchmdMain}. I ran the model for 25 epochs, where each fold used 5 epochs. The reason my epoch count is low is the training took a very long time. 
 
 \section{Accurracies}
 
@@ -55,7 +62,7 @@ Using the visualization code from \cite{monaitutorial} the predictions of the mo
 	\includegraphics[width=0.9\textwidth]{imgs/inputs2.png}
 	\includegraphics[width=0.9\textwidth]{imgs/gt2.png}
 	\includegraphics[width=0.9\textwidth]{imgs/pred2.png}
-	\caption{}
+	\caption{Another visualization of the predictions, this follows the same layout described in figure 2.}
 	\label{fig:}
 \end{figure*}
 
