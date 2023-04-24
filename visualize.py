@@ -27,7 +27,7 @@ def visualize(model: torch.nn.Module, device):
   plt.figure("input")
   for channel in range(num_input_channels):
     plt.subplot(1, num_input_channels, channel + 1)
-    plt.title(f"Predicted mask channel {channel}")
+    plt.title(f"Input channel {channel}")
     plt.imshow(validation_dataset[index]['image'][channel, :, :, frame].detach().cpu(), cmap="gray")
   plt.savefig("inputs.png")
 
