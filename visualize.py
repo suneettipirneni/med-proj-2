@@ -16,7 +16,7 @@ def visualize(model: torch.nn.Module, device):
     cache_rate=0.0,
   )
 
-  index = 6
+  index = 10
   frame = 70
   input = validation_dataset[index]['image'].unsqueeze(0).to(device)
   predicted = post_trans(inference(model, input)[0])
