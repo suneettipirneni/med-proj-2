@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from util import inference, post_trans
 
 def visualize(dataset: Dataset, model: torch.nn.Module, device):
-  index = 0
-  frame = 60
+  index = 6
+  frame = 70
   input = dataset[index]['image'].unsqueeze(0).to(device)
   predicted = post_trans(inference(model, input)[0])
   fig_size = (24, 6)
