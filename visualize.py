@@ -12,7 +12,7 @@ def visualize(dataset: Dataset, model: torch.nn.Module, device):
   fig_size = (24, 6)
   num_pred_channels = 3
 
-  plt.figure("Predicted Mask", (18, 16))
+  plt.figure("Predicted Mask")
   for channel in range(num_pred_channels):
     plt.subplot(1, num_pred_channels, channel + 1)
     plt.title(f"Predicted mask channel {channel}")
@@ -20,7 +20,7 @@ def visualize(dataset: Dataset, model: torch.nn.Module, device):
 
   plt.savefig("pred.png")
 
-  plt.figure("Ground Truth Mask", (18, 16))
+  plt.figure("Ground Truth Mask")
   for channel in range(num_pred_channels):
     plt.subplot(1, num_pred_channels, channel + 1)
     plt.title(f"GT mask channel {channel}")
