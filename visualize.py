@@ -24,8 +24,8 @@ def visualize(model: torch.nn.Module, device):
   num_output_channels = 3
   num_input_channels = 4
 
-  plt.figure("input")
-  for channel in range(num_input_channels, fig_size):
+  plt.figure("input", fig_size)
+  for channel in range(num_input_channels):
     plt.subplot(1, num_input_channels, channel + 1)
     plt.title(f"Input channel {channel}")
     plt.imshow(validation_dataset[index]['image'][channel, :, :, frame].detach().cpu(), cmap="gray")
