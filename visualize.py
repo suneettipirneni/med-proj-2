@@ -21,21 +21,27 @@ def visualize(model: torch.nn.Module, device):
   input = validation_dataset[index]['image'].unsqueeze(0).to(device)
   predicted = post_trans(inference(model, input)[0])
   fig_size = (24, 6)
-  num_pred_channels = 3
+  num_output_channels = 3
+  num_input_channels = 4
 
-  
+  plt.figure("input")
+  for channel in range(num_input_channels):
+    plt.subplot(1, num_input_channels, channel + 1)
+    plt.title(f"Predicted mask channel {channel}")
+    plt.imshow(validation_dataset[index]['image'][channel, :, :, frame].detach().cpu(), cmap="gray")
+  plt.savefig("inputs.png")
 
   plt.figure("Predicted Mask", fig_size)
-  for channel in range(num_pred_channels):
-    plt.subplot(1, num_pred_channels, channel + 1)
+  for channel in range(num_output_channels):
+    plt.subplot(1, num_output_channels, channel + 1)
     plt.title(f"Predicted mask channel {channel}")
     plt.imshow(predicted[channel, :, :, frame].detach().cpu())
 
   plt.savefig("pred.png")
 
   plt.figure("Ground Truth Mask", fig_size)
-  for channel in range(num_pred_channels):
-    plt.subplot(1, num_pred_channels, channel + 1)
+  for channel in range(num_output_channels):
+    plt.subplot(1, num_output_channels, channel + 1)
     plt.title(f"GT mask channel {channel}")
     print(validation_dataset[index]['label'].shape)
     plt.imshow(validation_dataset[index]['label'][channel, :, :, frame].detach().cpu())
