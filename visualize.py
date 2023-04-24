@@ -24,6 +24,7 @@ def visualize(dataset: Dataset, model: torch.nn.Module, device):
   for channel in range(num_pred_channels):
     plt.subplot(1, num_pred_channels, channel + 1)
     plt.title(f"GT mask channel {channel}")
+    print(dataset[index]['label'].shape)
     plt.imshow(dataset[index]['label'][channel, :, :, frame].detach().cpu())
     
   plt.savefig("gt.png") 
