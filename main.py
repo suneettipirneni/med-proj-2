@@ -49,7 +49,7 @@ if __name__ == "__main__":
     section="training",
     download=False,
     num_workers=args.num_workers,
-    # cache_rate=0.0,
+    cache_rate=0.0,
   )
 
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

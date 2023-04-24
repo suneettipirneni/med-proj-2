@@ -13,7 +13,7 @@ def visualize(model: torch.nn.Module, device):
     section="training",
     download=False,
     num_workers=4,
-    # cache_rate=0.0,
+    cache_rate=0.0,
   )
 
   index = 6
