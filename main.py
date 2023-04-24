@@ -34,6 +34,7 @@ if __name__ == "__main__":
   parser.add_argument("--num_workers", type=str, default=4, help="The number of workers to use when loading the dataset")
   parser.add_argument("--k_folds", type=int, default=5, help="The number of folds to use for cross validation")
   parser.add_argument("--num_epochs", type=int, default=20, help="The total number of epochs to run for")
+  parser.add_argument("--mode", type=str, choices=['train', 'visualize'], default="train")
 
   args = parser.parse_args()
 
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     section="training",
     download=False,
     num_workers=args.num_workers,
-    # cache_rate=0.0,
+    cache_rate=0.0,
   )
 
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -60,6 +61,10 @@ if __name__ == "__main__":
   loss_function = DiceLoss(smooth_nr=0, smooth_dr=1e-5, squared_pred=True, to_onehot_y=False, sigmoid=True)
   optimizer = torch.optim.Adam(model.parameters(), 1e-4, weight_decay=1e-5)
   lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)  
+
+  if (args.mode == 'visualize'):
+    model.load_state_dict(torch.load("./model-fold-4.pth", map_location=device))
+    exit(0)
 
   for fold, (train_ids, label_ids) in enumerate(folds):
     print(f"Fold {fold}")
