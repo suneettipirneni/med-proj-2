@@ -49,7 +49,7 @@ if __name__ == "__main__":
     section="training",
     download=False,
     num_workers=args.num_workers,
-    cache_rate=0.0,
+    # cache_rate=0.0,
   )
 
   device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load("./model-fold-4.pth", map_location=device))
     model.eval()
     with torch.no_grad():
-      visualize(train_dataset, model, device)
+      visualize(model, device)
     exit(0)
 
   for fold, (train_ids, label_ids) in enumerate(folds):
