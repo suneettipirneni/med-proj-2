@@ -68,7 +68,7 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load("./model-fold-4.pth", map_location=device))
     model.eval()
     with torch.no_grad():
-      visualize(train_dataset, model)
+      visualize(train_dataset, model, device)
     exit(0)
 
   for fold, (train_ids, label_ids) in enumerate(folds):
