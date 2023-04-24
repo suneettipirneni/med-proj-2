@@ -11,6 +11,8 @@ from train import train
 import torch
 import json
 
+from visualize import visualize
+
 def run_fold(folds, dataset, device):
   for fold, (train_ids, labels) in enumerate(folds):
     train_subsampler = SubsetRandomSampler(train_ids)
@@ -64,6 +66,9 @@ if __name__ == "__main__":
 
   if (args.mode == 'visualize'):
     model.load_state_dict(torch.load("./model-fold-4.pth", map_location=device))
+    model.eval()
+    with torch.no_grad():
+      visualize(train_dataset, model)
     exit(0)
 
   for fold, (train_ids, label_ids) in enumerate(folds):
